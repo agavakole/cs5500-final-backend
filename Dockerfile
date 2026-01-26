@@ -20,7 +20,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set environment variable directly in Dockerfile
-ENV CORS_ORIGINS=""
+
 
 EXPOSE 8000
 
