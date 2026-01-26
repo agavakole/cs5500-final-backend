@@ -1,6 +1,5 @@
 # app/core/config.py
 from typing import List
-
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -55,10 +54,12 @@ class Settings(BaseSettings):
     def parse_cors(cls, v):
         if isinstance(v, str):
             v = v.strip()
+            # Handle empty string - return empty list
+            if not v or v == "":
+                return []
             # If JSON array: starts with "["
             if v.startswith("["):
                 import json
-
                 return json.loads(v)
             # Otherwise treat as comma-separated list
             return [s.strip() for s in v.split(",") if s.strip()]
@@ -73,7 +74,6 @@ class Settings(BaseSettings):
                 return []
             if v.startswith("["):
                 import json
-
                 return json.loads(v)
             return [email.strip() for email in v.split(",") if email.strip()]
         return v

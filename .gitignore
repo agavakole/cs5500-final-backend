@@ -11,3 +11,8 @@ __pycache__/
 API_TESTING.md
 .cursorignore
 .env.dev.docker
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
