@@ -25,16 +25,21 @@ app = FastAPI(
 # 🌐 CORS (Cross-Origin Resource Sharing)
 # ---------------------------------------------------------
 # Default: allow all origins. If CORS_ORIGINS is provided, only allow those URLs.
-allow_all_origins = not settings.cors_origins
+if settings.cors_origins:
+    cors_origins_list = settings.cors_origins
+    allow_credentials = True
+else:
+    # Wildcard with credentials=False
+    cors_origins_list = ["*"]
+    allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[] if allow_all_origins else settings.cors_origins,
-    allow_origin_regex=".*" if allow_all_origins else None,
-    allow_credentials=True,
+    allow_origins=cors_origins_list,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 # ---------------------------------------------------------
 # 🧩 Register routers
 # ---------------------------------------------------------
