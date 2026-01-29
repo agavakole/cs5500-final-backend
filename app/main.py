@@ -14,7 +14,13 @@ from app.api.routes import (
 )
 from app.core.config import settings
 
-# Create FastAPI app instance
+# 👇 ADD THESE IMPORTS
+from app.db.session import engine
+from app.db.base import Base
+
+# ---------------------------------------------------------
+# 🚀 Create FastAPI app instance
+# ---------------------------------------------------------
 app = FastAPI(
     title=settings.app_name,
     description="Backend for QR code-based classroom checkin system",
@@ -22,24 +28,27 @@ app = FastAPI(
 )
 
 # ---------------------------------------------------------
+# 🗄️ AUTO-CREATE TABLES (Render free plan fix)
+# ---------------------------------------------------------
+@app.on_event("startup")
+def create_tables():
+    """
+    Automatically create database tables on startup.
+    This is required on Render free plan where we can't run shell commands.
+    """
+    Base.metadata.create_all(bind=engine)
+
+# ---------------------------------------------------------
 # 🌐 CORS (Cross-Origin Resource Sharing)
 # ---------------------------------------------------------
-# Default: allow all origins. If CORS_ORIGINS is provided, only allow those URLs.
-if settings.cors_origins:
-    cors_origins_list = settings.cors_origins
-    allow_credentials = True
-else:
-    # Wildcard with credentials=False
-    cors_origins_list = ["*"]
-    allow_credentials = False
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins_list,
-    allow_credentials=allow_credentials,
+    allow_origins=settings.cors_origins,  # MUST be a list
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # ---------------------------------------------------------
 # 🧩 Register routers
 # ---------------------------------------------------------
@@ -53,23 +62,17 @@ app.include_router(surveys.router, prefix="/api/surveys", tags=["Surveys"])
 app.include_router(sessions.router, prefix="/api/sessions", tags=["Sessions"])
 app.include_router(public.router, prefix="/api/public", tags=["Public"])
 
-
 # ---------------------------------------------------------
 # 🩺 Health and root endpoints
 # ---------------------------------------------------------
 @app.get("/")
 def root() -> dict[str, str]:
-    """Root endpoint for API verification."""
     return {"message": "5500 Backend is running!"}
-
 
 @app.get("/health")
 def health_check() -> dict[str, str]:
-    """Health check endpoint with environment info."""
     return {"status": "ok", "env": settings.app_env}
-
 
 @app.get("/favicon.ico")
 def favicon() -> str:
-    """Return empty response for favicon requests."""
     return ""
