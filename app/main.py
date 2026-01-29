@@ -15,9 +15,7 @@ from app.api.routes import (
 from app.core.config import settings
 
 # 👇 ADD THESE IMPORTS
-from app.db.session import engine
-from app.db.base import Base
-
+from app.db import engine, Base
 # ---------------------------------------------------------
 # 🚀 Create FastAPI app instance
 # ---------------------------------------------------------
